@@ -111,8 +111,13 @@ all_tests() ->
 %% -------------------------------------------------------------------
 
 init_per_suite(Config) ->
-    rabbit_ct_helpers:log_environment(),
-    rabbit_ct_helpers:run_setup_steps(Config).
+    case rabbit_feature_flags:is_enabled(quorum_queue) of
+        true ->
+            rabbit_ct_helpers:log_environment(),
+            rabbit_ct_helpers:run_setup_steps(Config);
+        false ->
+            {skip, "Quorum queues are unsupported"}
+    end.
 
 end_per_suite(Config) ->
     rabbit_ct_helpers:run_teardown_steps(Config).
